@@ -1,0 +1,54 @@
+# ── Dependencias ──────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ── Build / Output ────────────────────────────
+dist/
+dist-ssr/
+build/
+.output/
+.vinxi/
+
+# ── Variables de entorno ──────────────────────
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# ── Logs ──────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# ── Cache ─────────────────────────────────────
+.cache/
+.vite/
+.eslintcache
+.tanstack/
+
+# ── IDEs y editores ───────────────────────────
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# ── Testing ───────────────────────────────────
+coverage/
+*.lcov
+.nyc_output/
+
+# ── TypeScript ────────────────────────────────
+*.tsbuildinfo
+
+# ── Misc ──────────────────────────────────────
+*.local

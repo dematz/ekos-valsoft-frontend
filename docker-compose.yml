@@ -1,0 +1,21 @@
+services:
+  valsoft_front:
+    container_name: valsoft_ui
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Build-time: se bake en el JS bundle durante `bun run build:docker`.
+        # Cambia este valor si el backend corre en un host/puerto diferente.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/v1}
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+    networks:
+      - valsoft_network
+
+networks:
+  valsoft_network:
+    # Red externa compartida con el backend (valsoft_back o similar).
+    # Crear con: docker network create valsoft_network
+    external: true
