@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { BarChart3, LineChart } from "lucide-react";
-import { StatCard } from "@/components/dashboard/StatCard";
 import { ChartCard, SparklineChart, BarsChart } from "@/components/dashboard/StockChart";
-import { kpiApi } from "@/lib/api";
-import { mockKpis } from "@/lib/mocks";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -17,11 +13,12 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 function DashboardPage() {
-  const { data: kpis = mockKpis } = useQuery({
-    queryKey: ["kpis"],
-    queryFn: kpiApi.list,
-    initialData: mockKpis,
-  });
+  // TODO: Uncomment when backend implements /api/v1/dashboard/kpis endpoint
+  // const { data: kpis, isLoading } = useQuery({
+  //   queryKey: ["kpis"],
+  //   queryFn: kpiApi.list,
+  //   retry: false,
+  // });
 
   return (
     <div className="mx-auto max-w-7xl px-8 py-10">
@@ -32,11 +29,19 @@ function DashboardPage() {
         </p>
       </header>
 
-      <section className="grid grid-cols-4 gap-5">
-        {kpis.map((kpi) => (
-          <StatCard key={kpi.id} kpi={kpi} />
-        ))}
-      </section>
+      {/* TODO: KPIs section - enable when backend endpoint is ready
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Cargando indicadores…</p>
+      ) : !kpis?.length ? (
+        <p className="text-sm text-muted-foreground">Sin datos disponibles.</p>
+      ) : (
+        <section className="grid grid-cols-4 gap-5">
+          {kpis.map((kpi) => (
+            <StatCard key={kpi.id} kpi={kpi} />
+          ))}
+        </section>
+      )}
+      */}
 
       <section className="mt-6 grid grid-cols-2 gap-5">
         <ChartCard title="Rotación de stock (30d)" subtitle="Tendencia diaria" icon={LineChart}>

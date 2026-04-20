@@ -1,4 +1,4 @@
-import type { ApiItem, ApiPrediction, ApiAlert, ApiKpi } from '@/types/api';
+import type { ApiItem, ApiPrediction, ApiAlert, ApiKpi, ApiCategory, ItemFormData } from '@/types/api';
 
 export const API_CONFIG = {
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1",
@@ -38,12 +38,15 @@ export async function apiRequest<T = unknown>(path: string, options: RequestOpti
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), API_CONFIG.timeoutMs);
 
+  const token = localStorage.getItem("auth_token");
+
   try {
     const res = await fetch(buildUrl(path, params), {
       ...rest,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(headers ?? {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -54,6 +57,10 @@ export async function apiRequest<T = unknown>(path: string, options: RequestOpti
     const data = text ? (JSON.parse(text) as unknown) : undefined;
 
     if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem("auth_token");
+        window.location.href = "/login";
+      }
       throw new ApiError(res.status, `Request failed: ${res.status}`, data);
     }
     return data as T;
@@ -74,8 +81,17 @@ export const api = {
 };
 
 export const inventoryApi = {
-  list: () => api.get<ApiItem[]>('/items'),
+  list: () => api.get<{ data: ApiItem[] }>('/items').then((res) => res.data),
+  create: (data: ItemFormData) =>
+    api.post<{ data: ApiItem }>('/items', data).then((res) => res.data),
+  update: (id: number, data: Partial<ItemFormData>) =>
+    api.put<{ data: ApiItem }>(`/items/${id}`, data).then((res) => res.data),
+  remove: (id: number) => api.delete(`/items/${id}`),
   predict: (id: number) => api.get<ApiPrediction>(`/items/${id}/prediction`),
+};
+
+export const categoriesApi = {
+  list: () => api.get<{ data: ApiCategory[] }>('/categories').then((res) => res.data),
 };
 
 export const alertsApi = {

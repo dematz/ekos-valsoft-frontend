@@ -3,9 +3,11 @@ export type ApiItem = {
   name: string;
   sku: string;
   quantity: number;
-  min_stock: number;
+  price: number;
+  min_stock_threshold: number;
   category_id: number;
-  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+  status: 'in stock' | 'low stock' | 'ordered' | 'discontinued';
+  category?: { id: number; name: string };
 };
 
 export type ApiPrediction = {
@@ -20,6 +22,22 @@ export type ApiKpi = {
   value: string;
   delta: number;
   hint: string;
+};
+
+export type ApiCategory = {
+  id: number;
+  name: string;
+  description: string | null;
+};
+
+export type ItemFormData = {
+  name: string;
+  sku: string;
+  quantity: number;
+  price: number;
+  min_stock_threshold: number;
+  category_id: number;
+  status: ApiItem['status'];
 };
 
 export type ApiAlert = {

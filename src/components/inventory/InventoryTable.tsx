@@ -1,30 +1,33 @@
 import { useMemo, useState } from 'react';
-import { Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles, Pencil, Trash2 } from 'lucide-react';
 import type { ApiItem } from '@/types/api';
-import { CATEGORY_NAMES } from '@/lib/mocks';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLES: Record<ApiItem['status'], string> = {
-  'In Stock': "bg-chart-2/10 text-chart-2",
-  'Low Stock': "bg-chart-3/15 text-chart-3",
-  'Out of Stock': "bg-destructive/10 text-destructive",
+  'in stock':     "bg-chart-2/10 text-chart-2",
+  'low stock':    "bg-chart-3/15 text-chart-3",
+  'ordered':      "bg-chart-5/10 text-chart-5",
+  'discontinued': "bg-destructive/10 text-destructive",
 };
 
 const STATUS_LABEL: Record<ApiItem['status'], string> = {
-  'In Stock': "En Stock",
-  'Low Stock': "Bajo",
-  'Out of Stock': "Crítico",
+  'in stock':     "En Stock",
+  'low stock':    "Bajo",
+  'ordered':      "Pedido",
+  'discontinued': "Descontinuado",
 };
 
-const STATUS_FILTERS = ['all', 'In Stock', 'Low Stock', 'Out of Stock'] as const;
+const STATUS_FILTERS = ['all', 'in stock', 'low stock', 'ordered', 'discontinued'] as const;
 type StatusFilter = typeof STATUS_FILTERS[number];
 
 interface InventoryTableProps {
   items: ApiItem[];
   onPredict: (item: ApiItem) => void;
+  onEdit: (item: ApiItem) => void;
+  onDelete: (item: ApiItem) => void;
 }
 
-export function InventoryTable({ items, onPredict }: InventoryTableProps) {
+export function InventoryTable({ items, onPredict, onEdit, onDelete }: InventoryTableProps) {
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
@@ -82,7 +85,7 @@ export function InventoryTable({ items, onPredict }: InventoryTableProps) {
               <th className="px-5 py-3 text-right">Cantidad</th>
               <th className="px-5 py-3 text-right">Stock Min.</th>
               <th className="px-5 py-3">Estado</th>
-              <th className="px-5 py-3 text-right">Acción</th>
+              <th className="px-5 py-3 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -94,10 +97,10 @@ export function InventoryTable({ items, onPredict }: InventoryTableProps) {
                 <td className="px-5 py-3.5 font-mono text-xs text-muted-foreground">{it.sku}</td>
                 <td className="px-5 py-3.5 font-medium">{it.name}</td>
                 <td className="px-5 py-3.5 text-muted-foreground">
-                  {CATEGORY_NAMES[it.category_id] ?? `Cat. ${it.category_id}`}
+                  {it.category?.name ?? `Cat. ${it.category_id}`}
                 </td>
                 <td className="px-5 py-3.5 text-right tabular-nums">{it.quantity}</td>
-                <td className="px-5 py-3.5 text-right tabular-nums text-muted-foreground">{it.min_stock}</td>
+                <td className="px-5 py-3.5 text-right tabular-nums text-muted-foreground">{it.min_stock_threshold}</td>
                 <td className="px-5 py-3.5">
                   <span
                     className={cn(
@@ -109,13 +112,29 @@ export function InventoryTable({ items, onPredict }: InventoryTableProps) {
                   </span>
                 </td>
                 <td className="px-5 py-3.5 text-right">
-                  <button
-                    onClick={() => onPredict(it)}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Predecir Stock
-                  </button>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      onClick={() => onPredict(it)}
+                      className="inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Predecir
+                    </button>
+                    <button
+                      onClick={() => onEdit(it)}
+                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      aria-label="Editar"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => onDelete(it)}
+                      className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      aria-label="Eliminar"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

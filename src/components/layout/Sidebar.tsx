@@ -1,6 +1,7 @@
 import { Link, useLocation } from '@tanstack/react-router';
 import { LayoutDashboard, Boxes, Bell, LogOut, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/auth';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -10,6 +11,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const location = useLocation();
+  const { logout } = useAuth();
 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
@@ -65,13 +67,13 @@ export function Sidebar() {
             <p className="text-sm font-medium">María R.</p>
             <p className="text-[11px] text-muted-foreground">Operaciones</p>
           </div>
-          <Link
-            to="/login"
+          <button
+            onClick={logout}
             className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             aria-label="Cerrar sesión"
           >
             <LogOut className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </aside>

@@ -1,7 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useSearch } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { API_CONFIG } from "@/lib/api";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
+  beforeLoad: () => {
+    if (localStorage.getItem("auth_token")) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Iniciar sesión · Inventario Inteligente" },
@@ -12,7 +21,14 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const navigate = useNavigate();
+  const { redirect: redirectTo } = useSearch({ from: "/login" });
+
+  const handleGoogleLogin = () => {
+    if (redirectTo) {
+      sessionStorage.setItem("auth_redirect", redirectTo);
+    }
+    window.location.href = `${API_CONFIG.baseURL}/auth/google/redirect`;
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -37,7 +53,7 @@ function LoginPage() {
           </div>
 
           <button
-            onClick={() => navigate({ to: "/dashboard" })}
+            onClick={handleGoogleLogin}
             className="group flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
           >
             <GoogleIcon />
